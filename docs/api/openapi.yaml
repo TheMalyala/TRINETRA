@@ -89,6 +89,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
 
+  /auth/totp/setup:
+    post:
+      summary: Generate a new TOTP 2FA secret and provisioning URI
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret: { type: string }
+                  provisioning_uri: { type: string }
+
+  /auth/totp/verify:
+    post:
+      summary: Verify 6-digit TOTP code and enable 2FA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified: { type: boolean }
+
   /profiles:
     get:
       summary: List profiles (self and family dependants)
@@ -325,6 +359,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SyncPullResponse'
+
+  /backup/export:
+    post:
+      summary: Export encrypted backup envelope with SHA-256 integrity hash
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupEnvelope'
+
+  /backup/restore:
+    post:
+      summary: Restore patient records from verified backup envelope
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupEnvelope'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restored: { type: boolean }
+                  records_count: { type: integer }
 
 components:
   schemas:
@@ -578,4 +641,15 @@ components:
         license: { type: string }
         retrieval_date: { type: string }
         purpose: { type: string }
+
+    BackupEnvelope:
+      type: object
+      required: [version, user_id, timestamp, data_hash, payload]
+      properties:
+        version: { type: integer }
+        user_id: { type: string, format: uuid }
+        timestamp: { type: string, format: date-time }
+        data_hash: { type: string }
+        payload: { type: object }
+
 
