@@ -50,6 +50,8 @@ import org.trinetra.android.core.ui.components.UrgentEmergencyBanner
 import org.trinetra.android.core.ui.navigation.TrinetraDestination
 import org.trinetra.android.core.ui.navigation.TrinetraNavigationBar
 
+import org.trinetra.android.feature.scanner.DocumentScannerScreen
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,11 +68,22 @@ class MainActivity : ComponentActivity() {
 fun TrinetraMainShell() {
     val colors = LocalTrinetraColors.current
     var isLocked by remember { mutableStateOf(false) }
+    var isScanningDocument by remember { mutableStateOf(false) }
     var currentDestination by remember { mutableStateOf(TrinetraDestination.HOME) }
 
     if (isLocked) {
         AppLockScreen(
             onUnlockSuccess = { isLocked = false }
+        )
+    } else if (isScanningDocument) {
+        DocumentScannerScreen(
+            onSavedSuccessfully = { _, _ ->
+                isScanningDocument = false
+                currentDestination = TrinetraDestination.VAULT
+            },
+            onCancel = {
+                isScanningDocument = false
+            }
         )
     } else {
         Scaffold(
@@ -97,9 +110,12 @@ fun TrinetraMainShell() {
                 when (currentDestination) {
                     TrinetraDestination.HOME -> HomeDashboardContent(
                         onNavigateToVault = { currentDestination = TrinetraDestination.VAULT },
-                        onNavigateToCare = { currentDestination = TrinetraDestination.CARE }
+                        onNavigateToCare = { currentDestination = TrinetraDestination.CARE },
+                        onScanClicked = { isScanningDocument = true }
                     )
-                    TrinetraDestination.VAULT -> VaultTabContent()
+                    TrinetraDestination.VAULT -> VaultTabContent(
+                        onScanClicked = { isScanningDocument = true }
+                    )
                     TrinetraDestination.ASK -> DecoderTabContent()
                     TrinetraDestination.INBOX -> ConsultationsTabContent()
                     TrinetraDestination.CARE -> CareCircleTabContent()
@@ -170,7 +186,8 @@ fun TrinetraTopBar(
 @Composable
 fun HomeDashboardContent(
     onNavigateToVault: () -> Unit,
-    onNavigateToCare: () -> Unit
+    onNavigateToCare: () -> Unit,
+    onScanClicked: () -> Unit
 ) {
     val colors = LocalTrinetraColors.current
     val scrollState = rememberScrollState()
@@ -201,7 +218,7 @@ fun HomeDashboardContent(
         ) {
             TrinetraButton(
                 text = "+ Scan Document",
-                onClick = onNavigateToVault,
+                onClick = onScanClicked,
                 modifier = Modifier.weight(1f)
             )
             TrinetraOutlinedButton(
@@ -260,7 +277,9 @@ fun HomeDashboardContent(
 }
 
 @Composable
-fun VaultTabContent() {
+fun VaultTabContent(
+    onScanClicked: () -> Unit
+) {
     val colors = LocalTrinetraColors.current
 
     Column(
@@ -269,17 +288,40 @@ fun VaultTabContent() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = stringResource(R.string.records_vault_title),
-            color = colors.ink,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Encrypted local SQLite vault with FTS5 search indexing.",
-            color = colors.inkMuted,
-            fontSize = 13.sp
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.records_vault_title),
+                    color = colors.ink,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Encrypted local SQLite vault with FTS5 search.",
+                    color = colors.inkMuted,
+                    fontSize = 12.sp
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .border(1.dp, colors.ink, RoundedCornerShape(6.dp))
+                    .background(colors.ink, RoundedCornerShape(6.dp))
+                    .clickable(onClick = onScanClicked)
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = "+ Scan",
+                    color = colors.inverseInk,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
