@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Eye contour -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,34 C38,34 26,46 22,54 C26,62 38,74 54,74 C70,74 82,62 86,54 C82,46 70,34 54,34 Z M54,66 C47.37,66 42,60.63 42,54 C42,47.37 47.37,42 54,42 C60.63,42 66,47.37 66,54 C66,60.63 60.63,66 54,66 Z" />
+    <!-- Pupil / Inner Core -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,48 C50.69,48 48,50.69 48,54 C48,57.31 50.69,60 54,60 C57.31,60 60,57.31 60,54 C60,50.69 57.31,48 54,48 Z" />
+</vector>
