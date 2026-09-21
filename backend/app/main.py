@@ -26,6 +26,18 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 
+@app.get("/", tags=["Ops"])
+async def root():
+    """Root metadata endpoint."""
+    return {
+        "app": settings.PROJECT_NAME,
+        "version": "0.1.0",
+        "status": "online",
+        "docs": "/docs",
+        "health": "/healthz",
+    }
+
+
 @app.get("/healthz", tags=["Ops"])
 async def healthz():
     """Liveness check endpoint."""
