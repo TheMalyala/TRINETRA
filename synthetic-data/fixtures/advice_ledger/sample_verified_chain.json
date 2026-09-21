@@ -1,0 +1,42 @@
+[
+  {
+    "id": "adv-001",
+    "profile_id": "prof-001",
+    "doctor_id": "doc-001",
+    "body": "Dietary advice: reduce sodium to < 2g per day.",
+    "origin": "DOCTOR_SIGNED",
+    "signature": "sig_valid_01",
+    "tags": [
+      "diet",
+      "hypertension"
+    ],
+    "version": 1,
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash": "3e520ddacb3d58e0ffb2c2fbd140e86fb7c7b52e3595df606b9560fcf7fcb8f2"
+  },
+  {
+    "id": "adv-002",
+    "profile_id": "prof-001",
+    "doctor_id": "doc-001",
+    "body": "Prescribed home blood pressure monitoring twice daily.",
+    "origin": "DOCTOR_SIGNED",
+    "signature": "sig_valid_02",
+    "tags": [
+      "monitoring"
+    ],
+    "version": 1,
+    "prev_hash": "3e520ddacb3d58e0ffb2c2fbd140e86fb7c7b52e3595df606b9560fcf7fcb8f2",
+    "hash": "90b8a7c0e097544fc13c43826eee9f23c6b9ebb104803f2362391de7f9ca66b9"
+  },
+  {
+    "id": "adv-003",
+    "profile_id": "prof-001",
+    "doctor_id": "doc-002",
+    "body": "Phone consultation: report BP log after 2 weeks.",
+    "origin": "SELF_REPORTED",
+    "follow_up_on": "2026-10-15",
+    "version": 1,
+    "prev_hash": "90b8a7c0e097544fc13c43826eee9f23c6b9ebb104803f2362391de7f9ca66b9",
+    "hash": "0a49a183887b001296d73d66d43c75d3669a76f39d5810c33fc216e8e6dd4446"
+  }
+]
