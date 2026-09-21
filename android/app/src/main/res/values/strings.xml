@@ -8,4 +8,10 @@
     <string name="nav_care">Care</string>
     <string name="emergency_banner_title">Urgent</string>
     <string name="emergency_banner_body">If experiencing chest pain, breathing difficulty, or severe symptoms, call 112 or 108 immediately.</string>
+    <string name="lock_vault">Lock</string>
+    <string name="active_profile">Self (Abhinay)</string>
+    <string name="records_vault_title">Records Vault</string>
+    <string name="ask_netra_title">Jargon Decoder</string>
+    <string name="care_circle_title">Doctor Care Circle</string>
+    <string name="inbox_title">Consultations</string>
 </resources>

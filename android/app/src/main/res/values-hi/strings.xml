@@ -8,4 +8,10 @@
     <string name="nav_care">देखभाल</string>
     <string name="emergency_banner_title">आपातकालीन</string>
     <string name="emergency_banner_body">यदि सीने में दर्द या सांस लेने में कठिनाई हो, तो तुरंत 112 या 108 पर कॉल करें।</string>
+    <string name="lock_vault">लॉक</string>
+    <string name="active_profile">स्वयं (अभिनय)</string>
+    <string name="records_vault_title">रिकॉर्ड वॉल्ट</string>
+    <string name="ask_netra_title">मेडिकल डिकोडर</string>
+    <string name="care_circle_title">डॉक्टर केयर सर्किल</string>
+    <string name="inbox_title">परामर्श</string>
 </resources>
