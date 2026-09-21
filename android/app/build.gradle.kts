@@ -59,6 +59,7 @@ dependencies {
     implementation(project(":feature:scanner"))
     implementation(project(":feature:analytics"))
     implementation(project(":feature:decoder"))
+    implementation(project(":feature:chat"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

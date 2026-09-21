@@ -51,6 +51,7 @@ import org.trinetra.android.core.ui.navigation.TrinetraDestination
 import org.trinetra.android.core.ui.navigation.TrinetraNavigationBar
 
 import org.trinetra.android.feature.analytics.AnalyticsScreen
+import org.trinetra.android.feature.chat.ConsultationsChatScreen
 import org.trinetra.android.feature.decoder.MedicalTermDecoderScreen
 import org.trinetra.android.feature.scanner.DocumentScannerScreen
 
@@ -125,7 +126,9 @@ fun TrinetraMainShell() {
                         onScanClicked = { isScanningDocument = true }
                     )
                     TrinetraDestination.ASK -> MedicalTermDecoderScreen()
-                    TrinetraDestination.INBOX -> ConsultationsTabContent()
+                    TrinetraDestination.INBOX -> ConsultationsChatScreen(
+                        onNavigateToAdviceLedger = { currentDestination = TrinetraDestination.CARE }
+                    )
                     TrinetraDestination.CARE -> CareCircleTabContent()
                 }
             }
@@ -383,30 +386,6 @@ fun VaultTabContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ConsultationsTabContent() {
-    val colors = LocalTrinetraColors.current
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.inbox_title),
-            color = colors.ink,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Time-boxed, consent-scoped doctor messaging. Advice provided can be promoted directly to your Advice Ledger.",
-            color = colors.inkMuted,
-            fontSize = 13.sp
-        )
     }
 }
 

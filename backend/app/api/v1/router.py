@@ -1,11 +1,24 @@
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import (
+    APIRouter,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
 from pydantic import BaseModel, EmailStr
 
 from app.services.ai_gateway import AIQueryResponse, ai_gateway
 from app.services.auth_service import auth_service
 from app.services.backup_service import BackupEnvelope, backup_service
+from app.services.chat_service import (
+    AdviceEntryRecord,
+    ConversationRecord,
+    MessageRecord,
+    chat_service,
+)
+from app.services.chat_ws import chat_ws_manager
 from app.services.consent_service import ConsentRecord, consent_service
 from app.services.knowledge_service import (
     DrugProduct,
@@ -408,3 +421,118 @@ async def search_drugs(q: str):
 @api_router.get("/knowledge/sources", response_model=List[KnowledgeSource])
 async def list_knowledge_sources():
     return knowledge_service.get_registered_sources()
+
+
+# Phase 7: Messenger & Consultation Endpoints
+class ConversationCreateRequest(BaseModel):
+    profile_id: str
+    participant_doctor_id: str
+
+
+class SendMessageRequest(BaseModel):
+    sender_id: str
+    sender_role: str
+    body: str
+    attachments: Optional[List[Dict[str, Any]]] = None
+
+
+class PromoteToAdviceRequest(BaseModel):
+    signature: Optional[str] = None
+
+
+@api_router.post(
+    "/conversations", response_model=ConversationRecord, status_code=201
+)
+async def create_conversation(req: ConversationCreateRequest):
+    try:
+        return chat_service.create_conversation(
+            profile_id=req.profile_id,
+            participant_doctor_id=req.participant_doctor_id,
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
+        )
+
+
+@api_router.get("/conversations", response_model=List[ConversationRecord])
+async def list_conversations(profile_id: Optional[str] = None):
+    return chat_service.list_conversations(profile_id)
+
+
+@api_router.get(
+    "/conversations/{conversation_id}/messages",
+    response_model=List[MessageRecord],
+)
+async def get_conversation_messages(conversation_id: str):
+    return chat_service.get_messages(conversation_id)
+
+
+@api_router.post(
+    "/conversations/{conversation_id}/messages",
+    response_model=MessageRecord,
+    status_code=201,
+)
+async def send_conversation_message(
+    conversation_id: str, req: SendMessageRequest
+):
+    try:
+        msg = chat_service.send_message(
+            conversation_id=conversation_id,
+            sender_id=req.sender_id,
+            sender_role=req.sender_role,
+            body=req.body,
+            attachments=req.attachments,
+        )
+        await chat_ws_manager.broadcast(conversation_id, msg.model_dump())
+        return msg
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+        )
+
+
+@api_router.post(
+    "/conversations/{conversation_id}/messages/{message_id}/promote-to-advice",
+    response_model=AdviceEntryRecord,
+    status_code=201,
+)
+async def promote_message(
+    conversation_id: str,
+    message_id: str,
+    req: Optional[PromoteToAdviceRequest] = None,
+):
+    try:
+        sig = req.signature if req else None
+        return chat_service.promote_to_advice(
+            conversation_id=conversation_id,
+            message_id=message_id,
+            signature=sig,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        )
+
+
+@api_router.get("/advice", response_model=List[AdviceEntryRecord])
+async def get_advice_ledger(profile_id: str):
+    return chat_service.get_advice_entries(profile_id)
+
+
+@api_router.websocket("/ws/chat/{conversation_id}")
+async def chat_websocket(websocket: WebSocket, conversation_id: str):
+    await chat_ws_manager.connect(conversation_id, websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await chat_ws_manager.broadcast(
+                conversation_id, {"type": "chat_ping", "raw": data}
+            )
+    except WebSocketDisconnect:
+        chat_ws_manager.disconnect(conversation_id, websocket)
+

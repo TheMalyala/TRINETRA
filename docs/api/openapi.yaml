@@ -240,6 +240,10 @@ paths:
   /conversations:
     get:
       summary: List active conversation threads
+      parameters:
+        - name: profile_id
+          in: query
+          schema: { type: string, format: uuid }
       responses:
         '200':
           content:
@@ -248,6 +252,81 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Conversation'
+    post:
+      summary: Start a new conversation thread with a doctor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+
+  /conversations/{conversation_id}/messages:
+    get:
+      summary: Retrieve chronological immutable messages for a conversation
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+    post:
+      summary: Send a message within a conversation
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /conversations/{conversation_id}/messages/{message_id}/promote-to-advice:
+    post:
+      summary: Promote doctor message directly to official Advice Ledger
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: message_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromoteToAdviceRequest'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdviceEntry'
 
   /ai/explain-report:
     post:
@@ -514,11 +593,58 @@ components:
 
     Conversation:
       type: object
-      required: [id, participant_doctor_id, last_activity]
+      required: [id, profile_id, participant_doctor_id, last_activity]
       properties:
         id: { type: string, format: uuid }
+        profile_id: { type: string, format: uuid }
         participant_doctor_id: { type: string, format: uuid }
         last_activity: { type: string, format: date-time }
+
+    ConversationCreate:
+      type: object
+      required: [profile_id, participant_doctor_id]
+      properties:
+        profile_id: { type: string, format: uuid }
+        participant_doctor_id: { type: string, format: uuid }
+
+    Message:
+      type: object
+      required: [id, conversation_id, sender_id, sender_role, body, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        conversation_id: { type: string, format: uuid }
+        sender_id: { type: string, format: uuid }
+        sender_role: { type: string, enum: [patient, doctor] }
+        body: { type: string }
+        attachments:
+          type: array
+          items: { type: object }
+        promoted_to_advice_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+
+    MessageCreate:
+      type: object
+      required: [sender_id, sender_role, body]
+      properties:
+        sender_id: { type: string, format: uuid }
+        sender_role: { type: string, enum: [patient, doctor] }
+        body: { type: string }
+        attachments:
+          type: array
+          items: { type: object }
+
+    PromoteToAdviceRequest:
+      type: object
+      properties:
+        tags:
+          type: array
+          items: { type: string }
+        follow_up_on: { type: string, format: date }
+        tests_ordered:
+          type: array
+          items: { type: string }
+        signature: { type: string }
+
 
     ExplainReportRequest:
       type: object
