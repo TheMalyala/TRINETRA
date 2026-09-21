@@ -50,6 +50,7 @@ import org.trinetra.android.core.ui.components.UrgentEmergencyBanner
 import org.trinetra.android.core.ui.navigation.TrinetraDestination
 import org.trinetra.android.core.ui.navigation.TrinetraNavigationBar
 
+import org.trinetra.android.feature.analytics.AnalyticsScreen
 import org.trinetra.android.feature.scanner.DocumentScannerScreen
 
 class MainActivity : ComponentActivity() {
@@ -69,6 +70,7 @@ fun TrinetraMainShell() {
     val colors = LocalTrinetraColors.current
     var isLocked by remember { mutableStateOf(false) }
     var isScanningDocument by remember { mutableStateOf(false) }
+    var isViewingAnalytics by remember { mutableStateOf(false) }
     var currentDestination by remember { mutableStateOf(TrinetraDestination.HOME) }
 
     if (isLocked) {
@@ -84,6 +86,10 @@ fun TrinetraMainShell() {
             onCancel = {
                 isScanningDocument = false
             }
+        )
+    } else if (isViewingAnalytics) {
+        AnalyticsScreen(
+            onBack = { isViewingAnalytics = false }
         )
     } else {
         Scaffold(
@@ -111,7 +117,8 @@ fun TrinetraMainShell() {
                     TrinetraDestination.HOME -> HomeDashboardContent(
                         onNavigateToVault = { currentDestination = TrinetraDestination.VAULT },
                         onNavigateToCare = { currentDestination = TrinetraDestination.CARE },
-                        onScanClicked = { isScanningDocument = true }
+                        onScanClicked = { isScanningDocument = true },
+                        onViewAnalyticsClicked = { isViewingAnalytics = true }
                     )
                     TrinetraDestination.VAULT -> VaultTabContent(
                         onScanClicked = { isScanningDocument = true }
@@ -187,7 +194,8 @@ fun TrinetraTopBar(
 fun HomeDashboardContent(
     onNavigateToVault: () -> Unit,
     onNavigateToCare: () -> Unit,
-    onScanClicked: () -> Unit
+    onScanClicked: () -> Unit,
+    onViewAnalyticsClicked: () -> Unit
 ) {
     val colors = LocalTrinetraColors.current
     val scrollState = rememberScrollState()
@@ -234,16 +242,30 @@ fun HomeDashboardContent(
                 .fillMaxWidth()
                 .border(1.dp, colors.line, RoundedCornerShape(8.dp))
                 .background(colors.surface, RoundedCornerShape(8.dp))
+                .clickable(onClick = onViewAnalyticsClicked)
                 .padding(16.dp)
         ) {
             Column {
-                Text(
-                    text = "LATEST OBSERVATION",
-                    color = colors.inkMuted,
-                    fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "LATEST OBSERVATION",
+                        color = colors.inkMuted,
+                        fontSize = 11.sp,
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "View Analytics →",
+                        color = colors.ink,
+                        fontSize = 11.sp,
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 ObservationValueText(
                     value = 7.4,

@@ -54,7 +54,9 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
     implementation(project(":core:database"))
+    implementation(project(":core:analytics-engine"))
     implementation(project(":feature:scanner"))
+    implementation(project(":feature:analytics"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
