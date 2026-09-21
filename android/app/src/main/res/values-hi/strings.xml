@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">त्रिनेत्र</string>
+    <string name="tagline">वह आँख जो शरीर के छिपे रहस्यों को देखती है।</string>
+    <string name="nav_home">होम</string>
+    <string name="nav_vault">वॉल्ट</string>
+    <string name="nav_ask">पूछें</string>
+    <string name="nav_inbox">संदेश</string>
+    <string name="nav_care">देखभाल</string>
+    <string name="emergency_banner_title">आपातकालीन</string>
+    <string name="emergency_banner_body">यदि सीने में दर्द या सांस लेने में कठिनाई हो, तो तुरंत 112 या 108 पर कॉल करें।</string>
+</resources>

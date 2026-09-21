@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">TRINETRA</string>
+    <string name="tagline">The eye that sees what the body hides.</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_vault">Vault</string>
+    <string name="nav_ask">Ask</string>
+    <string name="nav_inbox">Inbox</string>
+    <string name="nav_care">Care</string>
+    <string name="emergency_banner_title">Urgent</string>
+    <string name="emergency_banner_body">If experiencing chest pain, breathing difficulty, or severe symptoms, call 112 or 108 immediately.</string>
+</resources>

@@ -1,0 +1,30 @@
+title = "Gitleaks config for TRINETRA"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowed fixtures and test secrets"
+paths = [
+    '''synthetic-data/.*''',
+    '''infra/secrets/\.env\.example''',
+    '''tests/fixtures/.*'''
+]
+regexes = [
+    '''EXAMPLE_[A-Z0-9_]+''',
+    '''placeholder''',
+    '''mock-token'''
+]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(?:key|api|token|secret|password|auth)[0-9a-z\-_.]{0,20}\s*[:=]\s*['"][0-9a-zA-Z\-_]{16,64}['"]'''
+entropy = 3.5
+secretGroup = 1
+
+[[rules]]
+id = "jwt-secret"
+description = "Potential JWT Secret or hardcoded key"
+regex = '''(?i)(?:jwt_secret|jwt_key)\s*[:=]\s*['"][0-9a-zA-Z\-_]{16,}['"]'''
+secretGroup = 1

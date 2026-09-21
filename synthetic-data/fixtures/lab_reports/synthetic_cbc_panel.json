@@ -1,0 +1,44 @@
+{
+  "document_id": "doc_synthetic_cbc_001",
+  "lab_name": "Apex Diagnostic Labs (Synthetic)",
+  "collected_date": "2026-08-15T09:30:00Z",
+  "panel_name": "Complete Blood Count (CBC)",
+  "observations": [
+    {
+      "name_as_printed": "Hemoglobin",
+      "loinc_code": "718-7",
+      "value_num": 13.8,
+      "unit_ucum": "g/dL",
+      "ref_low": 13.0,
+      "ref_high": 17.0,
+      "ref_source": "report"
+    },
+    {
+      "name_as_printed": "Total Leucocyte Count (TLC)",
+      "loinc_code": "6690-2",
+      "value_num": 8400.0,
+      "unit_ucum": "/uL",
+      "ref_low": 4000.0,
+      "ref_high": 11000.0,
+      "ref_source": "report"
+    },
+    {
+      "name_as_printed": "Platelet Count",
+      "loinc_code": "777-3",
+      "value_num": 240000.0,
+      "unit_ucum": "/uL",
+      "ref_low": 150000.0,
+      "ref_high": 450000.0,
+      "ref_source": "report"
+    },
+    {
+      "name_as_printed": "HbA1c (Glycosylated Hemoglobin)",
+      "loinc_code": "4548-4",
+      "value_num": 6.8,
+      "unit_ucum": "%",
+      "ref_low": 4.0,
+      "ref_high": 5.6,
+      "ref_source": "report"
+    }
+  ]
+}

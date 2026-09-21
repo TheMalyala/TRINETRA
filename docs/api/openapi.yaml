@@ -1,0 +1,477 @@
+openapi: 3.1.0
+info:
+  title: TRINETRA API
+  description: |
+    Privacy-first, local-first health-records platform API.
+    Tagline: The eye that sees what the body hides.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+paths:
+  /healthz:
+    get:
+      summary: Liveness check
+      responses:
+        '200':
+          description: Service is live
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "ok" }
+  /readyz:
+    get:
+      summary: Readiness check
+      responses:
+        '200':
+          description: Service and dependencies are healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "ready" }
+                  database: { type: string, example: "connected" }
+                  redis: { type: string, example: "connected" }
+
+  /auth/register:
+    post:
+      summary: Register a new patient or doctor account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/login:
+    post:
+      summary: Authenticate with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/refresh:
+    post:
+      summary: Refresh JWT access token using rotating refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  /profiles:
+    get:
+      summary: List profiles (self and family dependants)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+    post:
+      summary: Create a dependant family profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+
+  /doctors:
+    get:
+      summary: Browse and search doctors directory (Care Circle)
+      parameters:
+        - name: specialty
+          in: query
+          schema: { type: string }
+        - name: q
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Doctor'
+
+  /documents:
+    post:
+      summary: Upload a new health document or lab report
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, type, profile_id]
+              properties:
+                file: { type: string, format: binary }
+                type: { type: string, enum: [lab, imaging, prescription, discharge, bill, other] }
+                profile_id: { type: string, format: uuid }
+                doctor_id: { type: string, format: uuid }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+
+  /advice:
+    post:
+      summary: Record new clinical advice (self-reported or doctor-signed)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdviceCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdviceEntry'
+    get:
+      summary: Retrieve chronological hash-chained advice entries
+      parameters:
+        - name: profile_id
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdviceEntry'
+
+  /consents:
+    post:
+      summary: Create a time-boxed consent grant for a doctor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consent'
+
+  /conversations:
+    get:
+      summary: List active conversation threads
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Conversation'
+
+  /ai/explain-report:
+    post:
+      summary: Explain lab report observations with printed reference ranges
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExplainReportRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIResponse'
+
+  /ai/decode-term:
+    post:
+      summary: Decode clinical medical jargon term into plain language
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [term]
+              properties:
+                term: { type: string }
+                language: { type: string, default: "en" }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodedTermResponse'
+
+  /sync/push:
+    post:
+      summary: Push client outbox operations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncPushRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncPushResponse'
+
+  /sync/pull:
+    get:
+      summary: Pull changed shared objects since cursor
+      parameters:
+        - name: cursor
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncPullResponse'
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, password, role]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+        role: { type: string, enum: [patient, doctor] }
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+        totp_code: { type: string }
+
+    AuthResponse:
+      type: object
+      required: [user_id, access_token, refresh_token]
+      properties:
+        user_id: { type: string, format: uuid }
+        access_token: { type: string }
+        refresh_token: { type: string }
+        requires_totp: { type: boolean, default: false }
+
+    TokenResponse:
+      type: object
+      required: [access_token, refresh_token]
+      properties:
+        access_token: { type: string }
+        refresh_token: { type: string }
+
+    Profile:
+      type: object
+      required: [id, owner_user_id, relationship, name]
+      properties:
+        id: { type: string, format: uuid }
+        owner_user_id: { type: string, format: uuid }
+        relationship: { type: string, enum: [self, child, parent, other] }
+        name: { type: string }
+        dob: { type: string, format: date }
+        sex: { type: string }
+        blood_group: { type: string }
+
+    ProfileCreate:
+      type: object
+      required: [relationship, name]
+      properties:
+        relationship: { type: string, enum: [child, parent, other] }
+        name: { type: string }
+        dob: { type: string, format: date }
+        sex: { type: string }
+        blood_group: { type: string }
+
+    Doctor:
+      type: object
+      required: [id, display_name, verification_status]
+      properties:
+        id: { type: string, format: uuid }
+        display_name: { type: string }
+        registration_no: { type: string }
+        council: { type: string }
+        verification_status: { type: string, enum: [unverified, pending, verified, rejected] }
+        clinic_name: { type: string }
+        specialties: { type: array, items: { type: string } }
+
+    Document:
+      type: object
+      required: [id, profile_id, type, sha256]
+      properties:
+        id: { type: string, format: uuid }
+        profile_id: { type: string, format: uuid }
+        type: { type: string }
+        sha256: { type: string }
+        storage_ref: { type: string }
+        created_at: { type: string, format: date-time }
+
+    AdviceCreate:
+      type: object
+      required: [profile_id, doctor_id, body]
+      properties:
+        profile_id: { type: string, format: uuid }
+        doctor_id: { type: string, format: uuid }
+        body: { type: string }
+        follow_up_on: { type: string, format: date }
+        tests_ordered: { type: array, items: { type: string } }
+        origin: { type: string, enum: [self_reported, doctor_signed] }
+        signature: { type: string }
+
+    AdviceEntry:
+      type: object
+      required: [id, profile_id, doctor_id, body, origin, prev_hash, hash, version]
+      properties:
+        id: { type: string, format: uuid }
+        profile_id: { type: string, format: uuid }
+        doctor_id: { type: string, format: uuid }
+        body: { type: string }
+        origin: { type: string, enum: [self_reported, doctor_signed] }
+        prev_hash: { type: string }
+        hash: { type: string }
+        version: { type: integer }
+
+    ConsentCreate:
+      type: object
+      required: [doctor_id, scopes, expires_at]
+      properties:
+        doctor_id: { type: string, format: uuid }
+        scopes: { type: array, items: { type: string } }
+        expires_at: { type: string, format: date-time }
+
+    Consent:
+      type: object
+      required: [id, grantor_profile_id, grantee_doctor_id, scopes, expires_at]
+      properties:
+        id: { type: string, format: uuid }
+        grantor_profile_id: { type: string, format: uuid }
+        grantee_doctor_id: { type: string, format: uuid }
+        scopes: { type: array, items: { type: string } }
+        expires_at: { type: string, format: date-time }
+        revoked_at: { type: string, format: date-time }
+
+    Conversation:
+      type: object
+      required: [id, participant_doctor_id, last_activity]
+      properties:
+        id: { type: string, format: uuid }
+        participant_doctor_id: { type: string, format: uuid }
+        last_activity: { type: string, format: date-time }
+
+    ExplainReportRequest:
+      type: object
+      required: [document_id, observations]
+      properties:
+        document_id: { type: string, format: uuid }
+        observations:
+          type: array
+          items:
+            type: object
+            required: [name, value, unit]
+            properties:
+              name: { type: string }
+              value: { type: number }
+              unit: { type: string }
+              ref_low: { type: number }
+              ref_high: { type: number }
+
+    AIResponse:
+      type: object
+      required: [blocks, disclaimer_included, confidence]
+      properties:
+        blocks:
+          type: array
+          items:
+            type: object
+            required: [text, cites]
+            properties:
+              text: { type: string }
+              cites: { type: array, items: { type: string } }
+        red_flags: { type: array, items: { type: string } }
+        questions_for_doctor: { type: array, items: { type: string } }
+        confidence: { type: string, enum: [high, medium, low] }
+        disclaimer_included: { type: boolean }
+
+    DecodedTermResponse:
+      type: object
+      required: [term, one_liner, plain_explanation, what_to_ask_doctor, source_id]
+      properties:
+        term: { type: string }
+        one_liner: { type: string }
+        plain_explanation: { type: string }
+        what_to_ask_doctor: { type: string }
+        source_id: { type: string }
+
+    SyncPushRequest:
+      type: object
+      required: [operations]
+      properties:
+        operations: { type: array, items: { type: object } }
+
+    SyncPushResponse:
+      type: object
+      required: [processed_count, server_seq]
+      properties:
+        processed_count: { type: integer }
+        server_seq: { type: string }
+
+    SyncPullResponse:
+      type: object
+      required: [changes, next_cursor]
+      properties:
+        changes: { type: array, items: { type: object } }
+        next_cursor: { type: string }

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "term_dyspnoea",
+    "term": "dyspnoea",
+    "one_liner": "Shortness of breath or difficulty breathing.",
+    "plain_explanation": "Dyspnoea is the sensation of feeling winded, breathless, or having to work hard to breathe. It can occur temporarily after intense physical exertion or may be linked to lung, heart, or respiratory conditions.",
+    "what_to_ask_doctor": "What tests or evaluations can help identify why I feel breathless, and are there warning signs I should watch out for?",
+    "source_id": "src_medlineplus"
+  },
+  {
+    "id": "term_hba1c",
+    "term": "HbA1c",
+    "one_liner": "A blood test showing average blood sugar levels over the past 2 to 3 months.",
+    "plain_explanation": "HbA1c measures the percentage of hemoglobin (the oxygen-carrying protein in red blood cells) coated with sugar. Because red blood cells live for about 3 months, it reflects average blood glucose over that timeframe.",
+    "what_to_ask_doctor": "What is my personal target HbA1c range, and what changes to diet, exercise, or medications will help achieve it?",
+    "source_id": "src_medlineplus"
+  },
+  {
+    "id": "term_idiopathic",
+    "term": "idiopathic",
+    "one_liner": "A condition that arises spontaneously or without an identifiable cause.",
+    "plain_explanation": "When doctors describe a symptom or illness as idiopathic, it means thorough medical testing has not identified a specific underlying disease or trigger.",
+    "what_to_ask_doctor": "Are there other diagnostic options to consider, or will we focus on managing the symptoms?",
+    "source_id": "src_medlineplus"
+  }
+]

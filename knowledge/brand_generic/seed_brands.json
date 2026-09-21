@@ -1,0 +1,30 @@
+[
+  {
+    "brand_name": "Augmentin",
+    "generic_name": "Amoxicillin and Potassium Clavulanate",
+    "therapeutic_class": "Antibacterial",
+    "common_forms": ["Tablet", "Syrup"],
+    "source_id": "src_openfda"
+  },
+  {
+    "brand_name": "Glycomet",
+    "generic_name": "Metformin Hydrochloride",
+    "therapeutic_class": "Antidiabetic",
+    "common_forms": ["Tablet"],
+    "source_id": "src_openfda"
+  },
+  {
+    "brand_name": "Pan 40",
+    "generic_name": "Pantoprazole",
+    "therapeutic_class": "Proton Pump Inhibitor (Antacid)",
+    "common_forms": ["Tablet", "Injection"],
+    "source_id": "src_openfda"
+  },
+  {
+    "brand_name": "Telma 40",
+    "generic_name": "Telmisartan",
+    "therapeutic_class": "Angiotensin II Receptor Blocker (Antihypertensive)",
+    "common_forms": ["Tablet"],
+    "source_id": "src_openfda"
+  }
+]
