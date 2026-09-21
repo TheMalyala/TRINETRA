@@ -51,6 +51,7 @@ import org.trinetra.android.core.ui.navigation.TrinetraDestination
 import org.trinetra.android.core.ui.navigation.TrinetraNavigationBar
 
 import org.trinetra.android.feature.analytics.AnalyticsScreen
+import org.trinetra.android.feature.decoder.MedicalTermDecoderScreen
 import org.trinetra.android.feature.scanner.DocumentScannerScreen
 
 class MainActivity : ComponentActivity() {
@@ -123,7 +124,7 @@ fun TrinetraMainShell() {
                     TrinetraDestination.VAULT -> VaultTabContent(
                         onScanClicked = { isScanningDocument = true }
                     )
-                    TrinetraDestination.ASK -> DecoderTabContent()
+                    TrinetraDestination.ASK -> MedicalTermDecoderScreen()
                     TrinetraDestination.INBOX -> ConsultationsTabContent()
                     TrinetraDestination.CARE -> CareCircleTabContent()
                 }
@@ -380,80 +381,6 @@ fun VaultTabContent(
                         fontFamily = FontFamily.Monospace
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun DecoderTabContent() {
-    val colors = LocalTrinetraColors.current
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.ask_netra_title),
-            color = colors.ink,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Grounded clinical term explanations with citations. AI never diagnoses or prescribes.",
-            color = colors.inkMuted,
-            fontSize = 13.sp
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, colors.line, RoundedCornerShape(8.dp))
-                .background(colors.surface, RoundedCornerShape(8.dp))
-                .padding(16.dp)
-        ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "DECODED: HbA1c",
-                        color = colors.ink,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    SourceChip(
-                        sourceId = "MedlinePlus:LOINC 4548-4",
-                        onClick = {}
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "A test measuring average blood glucose over 2 to 3 months by examining glucose attached to hemoglobin.",
-                    color = colors.ink,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = "What to ask your doctor:",
-                    color = colors.inkMuted,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = "• Does my result meet the management target for my current regimen?",
-                    color = colors.ink,
-                    fontSize = 13.sp
-                )
             }
         }
     }

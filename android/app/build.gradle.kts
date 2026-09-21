@@ -55,8 +55,10 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:database"))
     implementation(project(":core:analytics-engine"))
+    implementation(project(":core:ai"))
     implementation(project(":feature:scanner"))
     implementation(project(":feature:analytics"))
+    implementation(project(":feature:decoder"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

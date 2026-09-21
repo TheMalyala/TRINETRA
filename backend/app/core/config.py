@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     S3_SECRET_KEY: str = "seaweedfsadmin"
     S3_BUCKET_NAME: str = "trinetra-documents"
 
+    # AI Gateway
+    AI_PROVIDER: str = "mock"  # "mock", "ollama", "openai"
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    AI_MODEL: str = "llama3.2"
+
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
 

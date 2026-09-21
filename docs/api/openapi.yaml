@@ -251,6 +251,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/DecodedTermResponse'
 
+  /ai/query:
+    post:
+      summary: Query Netra assistant with full safety guardrails, emergency intercept, and citations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIQueryRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIQueryResponse'
+
+  /knowledge/drugs:
+    get:
+      summary: Search drug products and active generic ingredients
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DrugProduct'
+
+  /knowledge/sources:
+    get:
+      summary: List registered knowledge sources and open licenses
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KnowledgeSource'
+
   /sync/push:
     post:
       summary: Push client outbox operations
@@ -475,3 +520,62 @@ components:
       properties:
         changes: { type: array, items: { type: object } }
         next_cursor: { type: string }
+
+    AIQueryRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt: { type: string }
+        profile_id: { type: string, format: uuid }
+        language: { type: string, default: "en" }
+
+    AICitation:
+      type: object
+      required: [source_id, source_name]
+      properties:
+        source_id: { type: string }
+        source_name: { type: string }
+        url: { type: string }
+        reference_text: { type: string }
+
+    AIQueryResponse:
+      type: object
+      required: [response_text, is_emergency, disclaimer_included, citations]
+      properties:
+        response_text: { type: string }
+        is_emergency: { type: boolean }
+        emergency_numbers:
+          type: array
+          items: { type: string }
+        disclaimer_included: { type: boolean }
+        intent: { type: string }
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AICitation'
+        questions_for_doctor:
+          type: array
+          items: { type: string }
+
+    DrugProduct:
+      type: object
+      required: [brand_name, generic_name, therapeutic_class, source_id]
+      properties:
+        brand_name: { type: string }
+        generic_name: { type: string }
+        therapeutic_class: { type: string }
+        common_forms:
+          type: array
+          items: { type: string }
+        source_id: { type: string }
+
+    KnowledgeSource:
+      type: object
+      required: [source_id, source_name, license, retrieval_date, purpose]
+      properties:
+        source_id: { type: string }
+        source_name: { type: string }
+        license: { type: string }
+        retrieval_date: { type: string }
+        purpose: { type: string }
+
